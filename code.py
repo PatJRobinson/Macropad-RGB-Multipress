@@ -72,8 +72,8 @@ class Status:
 class pix_status:
     def __init__(self) -> None:
         self.status = ( Status(macropad.keyboard.send, (macropad.Keycode.A,)), \
-                        Status(macropad.keyboard.press, (macropad.Keycode.SHIFT, macropad.Keycode.B)), \
-                        Status(), \
+                        Status(macropad.keyboard_layout.write, ("B",)), \
+                        Status(macropad.keyboard_layout.write, ("Hello, World!",)), \
                         Status(macropad.consumer_control.send, (macropad.ConsumerControlCode.VOLUME_DECREMENT,)), \
                         Status(macropad.consumer_control.send, (macropad.ConsumerControlCode.VOLUME_INCREMENT,)), \
                         Status(), \
@@ -173,7 +173,7 @@ while True:
             #     macropad.consumer_control.send(
             #         macropad.ConsumerControlCode.VOLUME_INCREMENT
             #     )
-                
+            
         if key_event.released:
             pixels.release_key(key_event.key_number)
 
