@@ -40,7 +40,7 @@ def voidfunc(val):
     pass
 
 class Status:
-    def __init__(self, func = voidfunc, params = 0) -> None:
+    def __init__(self, func = voidfunc, params = []) -> None:
         self.status = IDLE
         self.ticks_pressed = 0
         self.function = func
@@ -62,17 +62,20 @@ class Status:
 
         elif self.status == PRESSED:
             if (self.ticks_pressed == 0) or (self.ticks_pressed > KEY_REPEAT_THRESHOLD):
-                self.function(self.params)
-            
+                if len(self.params) > 0:
+                    self.function(*self.params)
             self.ticks_pressed += 1
+            
+        elif self.status == IDLE:
+            pass
 
 class pix_status:
     def __init__(self) -> None:
-        self.status = ( Status(macropad.keyboard.send, macropad.Keycode.A), \
-                        Status(macropad.keyboard.send, macropad.Keycode.B), \
+        self.status = ( Status(macropad.keyboard.send, (macropad.Keycode.A,)), \
+                        Status(macropad.keyboard.press, (macropad.Keycode.SHIFT, macropad.Keycode.B)), \
                         Status(), \
-                        Status(macropad.consumer_control.send, macropad.ConsumerControlCode.VOLUME_DECREMENT), \
-                        Status(macropad.consumer_control.send, macropad.ConsumerControlCode.VOLUME_INCREMENT), \
+                        Status(macropad.consumer_control.send, (macropad.ConsumerControlCode.VOLUME_DECREMENT,)), \
+                        Status(macropad.consumer_control.send, (macropad.ConsumerControlCode.VOLUME_INCREMENT,)), \
                         Status(), \
                         Status(), \
                         Status(), \
@@ -147,18 +150,12 @@ while True:
 
     if (pixels.any_pressed()):       
         pixels.highlight_keys()
-
     else:
         update_colours()
-    
-    pixels.process_events()
     
     if key_event:
         if key_event.pressed:
             pixels.press_key(key_event.key_number)
-            last_key_pressed = key_event.key_number
-            
-            
                 
             # if key_event.key_number == 0:
             #     macropad.keyboard.send(macropad.Keycode.A)
@@ -179,6 +176,8 @@ while True:
                 
         if key_event.released:
             pixels.release_key(key_event.key_number)
+
+    pixels.process_events()
 
     macropad.encoder_switch_debounced.update()
 
